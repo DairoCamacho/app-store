@@ -25,7 +25,7 @@ export class Product extends Entity {
     type: 'string',
     required: true,
   })
-  image: string;
+  img: string;
 
   @property({
     type: 'string',

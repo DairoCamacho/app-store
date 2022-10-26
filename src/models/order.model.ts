@@ -1,5 +1,5 @@
 import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
-import {Person} from './person.model';
+import {User} from './user.model';
 import {Product} from './product.model';
 import {OrderProduct} from './order-product.model';
 
@@ -36,8 +36,8 @@ export class Order extends Entity {
   })
   status?: number;
 
-  @belongsTo(() => Person)
-  personId: string;
+  @belongsTo(() => User)
+  userId: string;
 
   @hasMany(() => Product, {through: {model: () => OrderProduct}})
   products: Product[];

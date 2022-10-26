@@ -16,20 +16,20 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {
-  Person,
+  User,
   Order,
 } from '../models';
-import {PersonRepository} from '../repositories';
+import {UserRepository} from '../repositories';
 
-export class PersonOrderController {
+export class UserOrderController {
   constructor(
-    @repository(PersonRepository) protected personRepository: PersonRepository,
+    @repository(UserRepository) protected userRepository: UserRepository,
   ) { }
 
   @get('/people/{id}/orders', {
     responses: {
       '200': {
-        description: 'Array of Person has many Order',
+        description: 'Array of User has many Order',
         content: {
           'application/json': {
             schema: {type: 'array', items: getModelSchemaRef(Order)},
@@ -42,38 +42,38 @@ export class PersonOrderController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Order>,
   ): Promise<Order[]> {
-    return this.personRepository.orders(id).find(filter);
+    return this.userRepository.orders(id).find(filter);
   }
 
   @post('/people/{id}/orders', {
     responses: {
       '200': {
-        description: 'Person model instance',
+        description: 'User model instance',
         content: {'application/json': {schema: getModelSchemaRef(Order)}},
       },
     },
   })
   async create(
-    @param.path.string('id') id: typeof Person.prototype.id,
+    @param.path.string('id') id: typeof User.prototype.id,
     @requestBody({
       content: {
         'application/json': {
           schema: getModelSchemaRef(Order, {
-            title: 'NewOrderInPerson',
+            title: 'NewOrderInUser',
             exclude: ['id'],
-            optional: ['personId']
+            optional: ['userId']
           }),
         },
       },
     }) order: Omit<Order, 'id'>,
   ): Promise<Order> {
-    return this.personRepository.orders(id).create(order);
+    return this.userRepository.orders(id).create(order);
   }
 
   @patch('/people/{id}/orders', {
     responses: {
       '200': {
-        description: 'Person.Order PATCH success count',
+        description: 'User.Order PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -90,13 +90,13 @@ export class PersonOrderController {
     order: Partial<Order>,
     @param.query.object('where', getWhereSchemaFor(Order)) where?: Where<Order>,
   ): Promise<Count> {
-    return this.personRepository.orders(id).patch(order, where);
+    return this.userRepository.orders(id).patch(order, where);
   }
 
   @del('/people/{id}/orders', {
     responses: {
       '200': {
-        description: 'Person.Order DELETE success count',
+        description: 'User.Order DELETE success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -105,6 +105,6 @@ export class PersonOrderController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Order)) where?: Where<Order>,
   ): Promise<Count> {
-    return this.personRepository.orders(id).delete(where);
+    return this.userRepository.orders(id).delete(where);
   }
 }

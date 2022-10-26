@@ -2,7 +2,7 @@ import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Order} from './order.model';
 
 @model()
-export class Person extends Entity {
+export class User extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -26,6 +26,12 @@ export class Person extends Entity {
     type: 'string',
     required: true,
   })
+  userName: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   email: string;
 
   @property({
@@ -42,13 +48,13 @@ export class Person extends Entity {
   @hasMany(() => Order)
   orders: Order[];
 
-  constructor(data?: Partial<Person>) {
+  constructor(data?: Partial<User>) {
     super(data);
   }
 }
 
-export interface PersonRelations {
+export interface UserRelations {
   // describe navigational properties here
 }
 
-export type PersonWithRelations = Person & PersonRelations;
+export type UserWithRelations = User & UserRelations;
