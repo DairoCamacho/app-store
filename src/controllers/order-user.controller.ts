@@ -8,31 +8,31 @@ import {
 } from '@loopback/rest';
 import {
   Order,
-  User,
+  Person,
 } from '../models';
 import {OrderRepository} from '../repositories';
 
-export class OrderUserController {
+export class OrderPersonController {
   constructor(
     @repository(OrderRepository)
     public orderRepository: OrderRepository,
   ) { }
 
-  @get('/orders/{id}/user', {
+  @get('/orders/{id}/person', {
     responses: {
       '200': {
-        description: 'User belonging to Order',
+        description: 'Person belonging to Order',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(User)},
+            schema: {type: 'array', items: getModelSchemaRef(Person)},
           },
         },
       },
     },
   })
-  async getUser(
+  async getPerson(
     @param.path.string('id') id: typeof Order.prototype.id,
-  ): Promise<User> {
-    return this.orderRepository.user(id);
+  ): Promise<Person> {
+    return this.orderRepository.person(id);
   }
 }
