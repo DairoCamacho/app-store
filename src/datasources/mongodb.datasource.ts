@@ -5,7 +5,8 @@ require('dotenv').config();
 const config = {
   name: 'mongodb',
   connector: 'mongodb',
-  url: `mon-godb+srv://${process.env.PASSWORD_DB}@clusterprogweb.atdd8n3.mongodb.net/StoreDB?retryWrites=true&w=majority`,
+  // url: process.env.URL_MONGODB,
+  url: `mongodb+srv://${process.env.PASSWORD_DB}@clusterprogweb.atdd8n3.mongodb.net/StoreDB?retryWrites=true&w=majority`,
   host: '',
   port: 0,
   user: '',
