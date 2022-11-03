@@ -37,7 +37,7 @@ export class Person extends Entity {
   @property({
     type: 'string',
   })
-  password?: string;
+  password: string;
 
   @hasMany(() => Order)
   orders: Order[];

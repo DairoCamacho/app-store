@@ -1,3 +1,4 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,11 +20,14 @@ import {
 } from '@loopback/rest';
 import {Person} from '../models';
 import {PersonRepository} from '../repositories';
+import {AuthenticationService} from '../services';
 
 export class PersonController {
   constructor(
     @repository(PersonRepository)
-    public personRepository : PersonRepository,
+    public personRepository: PersonRepository,
+    @service(AuthenticationService)
+    public authenticationService: AuthenticationService,
   ) {}
 
   @post('/persons')
@@ -44,6 +48,9 @@ export class PersonController {
     })
     person: Omit<Person, 'id'>,
   ): Promise<Person> {
+    person.password = this.authenticationService.encryptPassword(
+      person.password,
+    );
     return this.personRepository.create(person);
   }
 
@@ -52,9 +59,7 @@ export class PersonController {
     description: 'Person model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Person) where?: Where<Person>,
-  ): Promise<Count> {
+  async count(@param.where(Person) where?: Where<Person>): Promise<Count> {
     return this.personRepository.count(where);
   }
 
@@ -70,9 +75,7 @@ export class PersonController {
       },
     },
   })
-  async find(
-    @param.filter(Person) filter?: Filter<Person>,
-  ): Promise<Person[]> {
+  async find(@param.filter(Person) filter?: Filter<Person>): Promise<Person[]> {
     return this.personRepository.find(filter);
   }
 
@@ -106,7 +109,8 @@ export class PersonController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Person, {exclude: 'where'}) filter?: FilterExcludingWhere<Person>
+    @param.filter(Person, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Person>,
   ): Promise<Person> {
     return this.personRepository.findById(id, filter);
   }
