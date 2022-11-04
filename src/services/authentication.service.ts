@@ -1,23 +1,28 @@
 import {injectable, /* inject, */ BindingScope} from '@loopback/core';
 import passwordGenerator from 'password-generator';
 import CryptoJS from 'crypto-js';
+import {User} from '../models/user.model';
+import {PersonRepository} from '../repositories';
+import {repository} from '@loopback/repository';
+
 // require('dotenv').config();
 import * as dotenv from 'dotenv';
 dotenv.config();
-console.log(process.env.ENCRYPTION_SECRET_KEY); // remove this after you've confirmed it is working
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class AuthenticationService {
-  constructor(/* Add @inject to inject parameters */) {}
+  constructor(
+    @repository(PersonRepository)
+    public personRepository: PersonRepository,
+  ) {}
 
   createPassword() {
     return passwordGenerator(12, false);
   }
 
-  SECRET_KEY_AES = process.env.ENCRYPTION_SECRET_KEY ?? 'sin dotenv';
+  SECRET_KEY_AES = process.env.KEY_AES ?? '';
 
   encryptPassword(password: string) {
-    console.log(this.SECRET_KEY_AES);
     const encryptedPassword = CryptoJS.AES.encrypt(
       password,
       this.SECRET_KEY_AES,
@@ -29,5 +34,20 @@ export class AuthenticationService {
     const bytes = CryptoJS.AES.decrypt(password, this.SECRET_KEY_AES);
     const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
     return decryptedPassword;
+  }
+
+  login(email: string, password: string) {
+    try {
+      const person = this.personRepository.findOne({
+        where: {email: email, password: password},
+      });
+      if (person != null) {
+        return person;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
   }
 }

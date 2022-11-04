@@ -1,6 +1,8 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-require('dotenv').config();
+// require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const config = {
   name: 'mongodb',
@@ -12,7 +14,7 @@ const config = {
   user: '',
   password: '',
   database: '',
-  useNewUrlParser: true
+  useNewUrlParser: true,
 };
 
 // Observe application's life cycle to disconnect the datasource when
@@ -20,8 +22,10 @@ const config = {
 // gracefully. The `stop()` method is inherited from `juggler.DataSource`.
 // Learn more at https://loopback.io/doc/en/lb4/Life-cycle.html
 @lifeCycleObserver('datasource')
-export class MongodbDataSource extends juggler.DataSource
-  implements LifeCycleObserver {
+export class MongodbDataSource
+  extends juggler.DataSource
+  implements LifeCycleObserver
+{
   static dataSourceName = 'mongodb';
   static readonly defaultConfig = config;
 

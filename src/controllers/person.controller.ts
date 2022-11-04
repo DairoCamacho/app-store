@@ -17,8 +17,10 @@ import {
   del,
   requestBody,
   response,
+  HttpErrors,
 } from '@loopback/rest';
 import {Person} from '../models';
+import {User} from '../models/user.model';
 import {PersonRepository} from '../repositories';
 import {AuthenticationService} from '../services';
 
@@ -29,6 +31,26 @@ export class PersonController {
     @service(AuthenticationService)
     public authenticationService: AuthenticationService,
   ) {}
+
+  @post('/login')
+  @response(200, {
+    description: 'logged in user with exist',
+  })
+  async login(@requestBody() user: User) {
+    const person = await this.authenticationService.login(
+      user.email,
+      user.password,
+    );
+
+    if (person) {
+      return {
+        data: person,
+        status: 'OK',
+      };
+    } else {
+      throw new HttpErrors[401]('The data entered is not valid!');
+    }
+  }
 
   @post('/persons')
   @response(200, {

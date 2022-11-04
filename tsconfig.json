@@ -4,7 +4,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"
-    // , "strictNullChecks": false
   },
   "include": ["src"]
 }
