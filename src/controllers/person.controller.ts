@@ -1,4 +1,4 @@
-import {service} from '@loopback/core';
+import { service } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,10 +19,10 @@ import {
   response,
   HttpErrors,
 } from '@loopback/rest';
-import {Person} from '../models';
-import {User} from '../models/user.model';
-import {PersonRepository} from '../repositories';
-import {AuthenticationService} from '../services';
+import { Person } from '../models';
+import { User } from '../models/user.model';
+import { PersonRepository } from '../repositories';
+import { AuthenticationService } from '../services';
 
 export class PersonController {
   constructor(
@@ -30,17 +30,14 @@ export class PersonController {
     public personRepository: PersonRepository,
     @service(AuthenticationService)
     public authenticationService: AuthenticationService,
-  ) {}
+  ) { }
 
   @post('/login')
   @response(200, {
     description: 'logged in user with exist',
   })
   async login(@requestBody() user: User) {
-    const person = await this.authenticationService.login(
-      user.email,
-      user.password,
-    );
+    const person = await this.authenticationService.login(user.email, user.password,);
 
     if (person) {
       return {
@@ -55,7 +52,7 @@ export class PersonController {
   @post('/persons')
   @response(200, {
     description: 'Person model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Person)}},
+    content: { 'application/json': { schema: getModelSchemaRef(Person) } },
   })
   async create(
     @requestBody({
@@ -79,7 +76,7 @@ export class PersonController {
   @get('/persons/count')
   @response(200, {
     description: 'Person model count',
-    content: {'application/json': {schema: CountSchema}},
+    content: { 'application/json': { schema: CountSchema } },
   })
   async count(@param.where(Person) where?: Where<Person>): Promise<Count> {
     return this.personRepository.count(where);
@@ -92,7 +89,7 @@ export class PersonController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Person, {includeRelations: true}),
+          items: getModelSchemaRef(Person, { includeRelations: true }),
         },
       },
     },
@@ -104,13 +101,13 @@ export class PersonController {
   @patch('/persons')
   @response(200, {
     description: 'Person PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
+    content: { 'application/json': { schema: CountSchema } },
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Person, {partial: true}),
+          schema: getModelSchemaRef(Person, { partial: true }),
         },
       },
     })
@@ -125,13 +122,13 @@ export class PersonController {
     description: 'Person model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(Person, {includeRelations: true}),
+        schema: getModelSchemaRef(Person, { includeRelations: true }),
       },
     },
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Person, {exclude: 'where'})
+    @param.filter(Person, { exclude: 'where' })
     filter?: FilterExcludingWhere<Person>,
   ): Promise<Person> {
     return this.personRepository.findById(id, filter);
@@ -146,7 +143,7 @@ export class PersonController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Person, {partial: true}),
+          schema: getModelSchemaRef(Person, { partial: true }),
         },
       },
     })

@@ -36,18 +36,25 @@ export class AuthenticationService {
     return decryptedPassword;
   }
 
-  login(email: string, password: string) {
-    try {
-      const person = this.personRepository.findOne({
-        where: {email: email, password: password},
-      });
-      if (person != null) {
+async login(email: string, password: string) {
+  try {
+    const person = await this.personRepository.findOne({
+      where: {email: email},
+    });
+    if (person != null) {
+      const decryptedPassword = this.decryptPassword(person.password);
+
+      // eslint-disable-next-line eqeqeq
+      if (decryptedPassword == password) {
         return person;
       } else {
         return false;
       }
-    } catch (error) {
+    } else {
       return false;
     }
+  } catch (error) {
+    return false;
   }
+}
 }
