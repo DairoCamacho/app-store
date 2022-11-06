@@ -24,28 +24,6 @@ export class AuthenticationService {
   SECRET_KEY_AES = process.env.KEY_AES;
   SECRET_KEY_JWT = process.env.KEY_JWT;
 
-  encryptPassword(password: string) {
-    if (this.SECRET_KEY_AES === undefined) {
-      throw new Error('environment variable AES not found');
-    } else {
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        password,
-        this.SECRET_KEY_AES,
-      ).toString();
-      return encryptedPassword;
-    }
-  }
-
-  decryptPassword(password: string) {
-    if (this.SECRET_KEY_AES === undefined) {
-      throw new Error('environment variable AES not found');
-    } else {
-      const bytes = CryptoJS.AES.decrypt(password, this.SECRET_KEY_AES);
-      const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
-      return decryptedPassword;
-    }
-  }
-
   encryptObject(data: {}) {
     if (this.SECRET_KEY_AES === undefined) {
       throw new Error('environment variable AES not found');
@@ -74,7 +52,7 @@ export class AuthenticationService {
         where: {email: email},
       });
       if (person != null) {
-        const decryptedPassword = this.decryptPassword(person.password);
+        const decryptedPassword = this.decryptObject(person.password);
 
         // eslint-disable-next-line eqeqeq
         if (decryptedPassword == password) {

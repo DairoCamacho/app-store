@@ -72,9 +72,7 @@ export class PersonController {
     })
     person: Omit<Person, 'id'>,
   ): Promise<Person> {
-    person.password = this.authenticationService.encryptPassword(
-      person.password,
-    );
+    person.password = this.authenticationService.encryptObject(person.password);
     return this.personRepository.create(person);
   }
 
