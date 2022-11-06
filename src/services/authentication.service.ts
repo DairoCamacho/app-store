@@ -1,9 +1,10 @@
 import {injectable, /* inject, */ BindingScope} from '@loopback/core';
 import passwordGenerator from 'password-generator';
 import CryptoJS from 'crypto-js';
-import {User} from '../models/user.model';
+import {Person} from '../models';
 import {PersonRepository} from '../repositories';
 import {repository} from '@loopback/repository';
+import jwt from 'jsonwebtoken';
 
 // require('dotenv').config();
 import * as dotenv from 'dotenv';
@@ -20,41 +21,89 @@ export class AuthenticationService {
     return passwordGenerator(12, false);
   }
 
-  SECRET_KEY_AES = process.env.KEY_AES ?? '';
+  SECRET_KEY_AES = process.env.KEY_AES;
+  SECRET_KEY_JWT = process.env.KEY_JWT;
 
   encryptPassword(password: string) {
-    const encryptedPassword = CryptoJS.AES.encrypt(
-      password,
-      this.SECRET_KEY_AES,
-    ).toString();
-    return encryptedPassword;
+    if (this.SECRET_KEY_AES === undefined) {
+      throw new Error('environment variable AES not found');
+    } else {
+      const encryptedPassword = CryptoJS.AES.encrypt(
+        password,
+        this.SECRET_KEY_AES,
+      ).toString();
+      return encryptedPassword;
+    }
   }
 
   decryptPassword(password: string) {
-    const bytes = CryptoJS.AES.decrypt(password, this.SECRET_KEY_AES);
-    const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
-    return decryptedPassword;
+    if (this.SECRET_KEY_AES === undefined) {
+      throw new Error('environment variable AES not found');
+    } else {
+      const bytes = CryptoJS.AES.decrypt(password, this.SECRET_KEY_AES);
+      const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
+      return decryptedPassword;
+    }
   }
 
-async login(email: string, password: string) {
-  try {
-    const person = await this.personRepository.findOne({
-      where: {email: email},
-    });
-    if (person != null) {
-      const decryptedPassword = this.decryptPassword(person.password);
+  encryptObject(data: {}) {
+    if (this.SECRET_KEY_AES === undefined) {
+      throw new Error('environment variable AES not found');
+    } else {
+      const encryptedObject = CryptoJS.AES.encrypt(
+        JSON.stringify(data),
+        this.SECRET_KEY_AES,
+      ).toString();
+      return encryptedObject;
+    }
+  }
 
-      // eslint-disable-next-line eqeqeq
-      if (decryptedPassword == password) {
-        return person;
+  decryptObject(data: string) {
+    if (this.SECRET_KEY_AES === undefined) {
+      throw new Error('environment variable AES not found');
+    } else {
+      const bytes = CryptoJS.AES.decrypt(data, this.SECRET_KEY_AES);
+      const decryptedObject = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      return decryptedObject;
+    }
+  }
+
+  async login(email: string, password: string) {
+    try {
+      const person = await this.personRepository.findOne({
+        where: {email: email},
+      });
+      if (person != null) {
+        const decryptedPassword = this.decryptPassword(person.password);
+
+        // eslint-disable-next-line eqeqeq
+        if (decryptedPassword == password) {
+          return person;
+        } else {
+          return false;
+        }
       } else {
         return false;
       }
-    } else {
+    } catch (error) {
       return false;
     }
-  } catch (error) {
-    return false;
   }
-}
+
+  generateTokenJWT(person: Person) {
+    if (this.SECRET_KEY_JWT === undefined) {
+      throw new Error('environment variable JWT not found');
+    } else {
+      const payload = this.encryptObject({
+        id: person.id,
+        name: person.name,
+        lastName: person.lastName,
+      });
+
+      const token = jwt.sign({payload}, this.SECRET_KEY_JWT, {
+        expiresIn: '1h',
+      });
+      return token;
+    }
+  }
 }
