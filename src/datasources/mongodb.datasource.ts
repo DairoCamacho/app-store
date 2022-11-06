@@ -1,14 +1,12 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-// require('dotenv').config();
-import * as dotenv from 'dotenv';
-dotenv.config();
+import {environment} from '../config/environment';
 
 const config = {
   name: 'mongodb',
   connector: 'mongodb',
   // url: process.env.URL_MONGODB,
-  url: `mongodb+srv://${process.env.PASSWORD_DB}@clusterprogweb.atdd8n3.mongodb.net/StoreDB?retryWrites=true&w=majority`,
+  url: `mongodb+srv://${environment.PASSWORD_DB}@clusterprogweb.atdd8n3.mongodb.net/StoreDB?retryWrites=true&w=majority`,
   host: '',
   port: 0,
   user: '',
